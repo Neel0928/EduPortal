@@ -1,6 +1,6 @@
 from flask import render_template
 from flask_login import login_required
-from app.models import StudentProfile, FacultyProfile, Notice, User
+from app.models import StudentProfile, FacultyProfile, Notice, User, Course
 from app.extensions import db
 from . import admin_bp
 from sqlalchemy import func
@@ -25,7 +25,9 @@ def dashboard():
     # Process for Chart.js
     course_labels = [stat[0] for stat in course_stats]
     course_counts = [stat[1] for stat in course_stats]
-    total_courses = len(course_labels)
+    
+    # True Total Courses
+    total_courses = Course.query.count()
 
     # 3. Recent Activity (Latest Notices)
     recent_notices = Notice.query.order_by(Notice.created_at.desc()).limit(5).all()
@@ -48,7 +50,7 @@ def system_report_print():
     # 1. Gather Data
     total_students = StudentProfile.query.count()
     total_faculty = FacultyProfile.query.count()
-    total_courses = db.session.query(StudentProfile.course_name).distinct().count()
+    total_courses = Course.query.count()
     
     # Detailed stats
     courses = db.session.query(StudentProfile.course_name, func.count(StudentProfile.id)).group_by(StudentProfile.course_name).all()

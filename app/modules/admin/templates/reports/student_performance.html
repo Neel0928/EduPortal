@@ -46,9 +46,9 @@
         <!-- 2. The Subject Mastery Radar -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col">
             <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-900">Class Academic DNA</h3>
+                <h3 class="text-lg font-bold text-gray-900">Class Average Performance</h3>
                 <p class="text-xs text-gray-500 mt-1">
-                    Visual footprint of the class's strengths. Spiky shapes indicate imbalance.
+                    Visual footprint of the class's strengths across different subjects and programs.
                 </p>
             </div>
             <div class="flex-grow relative min-h-[400px]">
@@ -294,31 +294,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.radar.labels.length > 0) {
                     const ctxRadar = document.getElementById('radarChart').getContext('2d');
                     new Chart(ctxRadar, {
-                        type: 'radar',
+                        type: 'bar',
                         data: {
                             labels: data.radar.labels,
                             datasets: [{
                                 label: 'Class Average',
                                 data: data.radar.data,
-                                backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                                backgroundColor: 'rgba(99, 102, 241, 0.8)',
                                 borderColor: 'rgba(99, 102, 241, 1)',
-                                pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-                                borderWidth: 2
+                                borderWidth: 1,
+                                borderRadius: 4
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
                             scales: {
-                                r: {
-                                    angleLines: { color: '#E5E7EB' },
-                                    grid: { color: '#E5E7EB' },
-                                    pointLabels: {
-                                        font: { size: 11, weight: '700' },
-                                        color: '#374151'
-                                    },
+                                y: {
                                     suggestedMin: 0,
-                                    suggestedMax: 100
+                                    suggestedMax: 100,
+                                    grid: { display: true, color: '#f3f4f6' }
+                                },
+                                x: {
+                                    grid: { display: false }
                                 }
                             },
                              plugins: { legend: {display: false} }

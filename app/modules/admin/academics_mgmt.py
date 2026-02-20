@@ -36,6 +36,7 @@ def attendance_list():
         summary.append({
             'name': s.display_name,
             'enrollment': s.enrollment_number,
+            'batch': s.batch_year,
             'total': total,
             'present': present,
             'absent': total - present,

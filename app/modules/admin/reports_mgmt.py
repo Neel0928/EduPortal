@@ -54,24 +54,43 @@ def dashboard():
             if s_avg < 40:
                 danger_zone_count += 1
     
-    # 5. Top Performer
+    # 5. Top Performer & Max Package
     top_student = "N/A"
     highest_avg = -1
+    highest_pkg = 0
     for sid, marks in student_marks_map.items():
         if marks:
             s_avg = statistics.mean(marks)
+            s_var = statistics.stdev(marks) if len(marks) > 1 else 0
+            
+            # Predict Package (Consistent with future_predictions logic)
+            if s_avg > 85:
+                base_pkg = 12.0 if s_var < 5 else 18.0
+            elif s_avg > 70:
+                base_pkg = 8.5
+            elif s_avg > 60:
+                base_pkg = 6.5
+            else:
+                base_pkg = 4.5
+            
+            potential_package = base_pkg + (s_var * 0.1)
+            
+            if potential_package > highest_pkg:
+                highest_pkg = potential_package
+
             if s_avg > highest_avg:
                 highest_avg = s_avg
-                # Fetch name lazy
                 top_student = StudentProfile.query.get(sid).display_name
     
+    projected_pkg = f"{round(highest_pkg, 1)} LPA" if highest_pkg > 0 else "N/A"
+
     stats = {
         'total_students': total_students,
         'total_faculty': total_faculty,
         'global_avg': global_avg_score,
         'attendance_pulse': "Stable",
         'danger_alerts': danger_zone_count,
-        'projected_highest_pkg': "18.5 LPA"
+        'projected_highest_pkg': projected_pkg
     }
 
     return render_template('reports/dashboard.html', stats=stats)
@@ -462,8 +481,8 @@ def future_data():
             role = 'Analyst'
             potential_package = 4.5
             
-        # Add variability to package
-        potential_package += random.uniform(-1.0, 3.0)
+        # Deterministic variability instead of random to maintain consistency across dashboards
+        potential_package += (s_var * 0.1)
         
         placement_projections.append(potential_package)
         
@@ -493,11 +512,29 @@ def future_data():
         prob_dist = {'tier1':0, 'tier2':0, 'tier3':0}
 
     # 4. Skill Gap Insight
-    # Identify the biggest gap preventing Tier 3 -> Tier 2
+    # Identify the weakest subject dynamically
+    lowest_sub_name = "Core Subjects"
+    lowest_sub_avg = 100
+    
+    sub_avgs = db.session.query(
+        Subject.name,
+        func.avg(StudentResult.marks_obtained)
+    ).join(ExamPaper, ExamPaper.subject_id == Subject.id)\
+     .join(StudentResult, StudentResult.exam_paper_id == ExamPaper.id)\
+     .group_by(Subject.name).all()
+     
+    if sub_avgs:
+        lowest_sub = min(sub_avgs, key=lambda x: x[1] if x[1] is not None else 100)
+        lowest_sub_name = lowest_sub[0]
+        lowest_sub_avg = lowest_sub[1] if lowest_sub[1] is not None else 100
+        
+    gap_pct = round(100 - lowest_sub_avg, 1) if lowest_sub_avg < 100 else 0
+    marginal_count = len([p for p in placement_projections if 6 <= p <= 8])
+
     skill_gap = {
-        'subject': 'Data Structures', # Mocked for impact
-        'gap': '15%',
-        'impact': 'Closing this gap moves 40 students to Tier 2.'
+        'subject': lowest_sub_name,
+        'gap': f"{gap_pct}%",
+        'impact': f"Closing this gap could move {marginal_count} students to higher placement tiers."
     }
 
     return jsonify({

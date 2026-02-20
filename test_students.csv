@@ -1,0 +1,11 @@
+name,email,password,enrollment_number,course_name,semester
+Alice Smith,alice.smith@example.com,pass123,TEST24-001,B.Tech,1
+Bob Jones,bob.jones@example.com,pass123,TEST24-002,BCA,1
+Charlie Brown,charlie.b@example.com,pass123,TEST24-003,MCA,1
+Diana Prince,diana.p@example.com,pass123,TEST24-004,B.Tech,3
+Ethan Hunt,ethan.h@example.com,pass123,TEST24-005,BCA,3
+Fiona Gallagher,fiona.g@example.com,pass123,TEST24-006,MCA,3
+George Costanza,george.c@example.com,pass123,TEST24-007,B.Tech,5
+Hannah Abbott,hannah.a@example.com,pass123,TEST24-008,BCA,5
+Ian Malcolm,ian.m@example.com,pass123,TEST24-009,MCA,5
+Julia Child,julia.c@example.com,pass123,TEST24-010,B.Tech,7
